@@ -52,7 +52,8 @@ public class View {
 
                             switch (key) {
                                 case "1":
-                                    System.out.println("all user online");
+                                    userClientService.onlineFriendList();
+//                                    System.out.println("all user online");
                                     break;
                                 case "2":
                                     System.out.println("send messages to all users");

@@ -73,6 +73,8 @@ public class QQServer {
                     //启动这个线程
                     scct.start();
                     //放入对应的线程hashMap
+//                    他这里写的有问题 他如果这么写 包括client 他这么写的后果就是一个主机只能有一个thread 因为id相同
+//                    hashmap会去重
                     ManageClientThreads.addClientThread(u.getUserId(), scct);
 
                     //

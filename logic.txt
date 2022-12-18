@@ -1,0 +1,11 @@
+他的逻辑是先通过登录验证
+等通过以后存入thread里面
+然后再将thread存入数组中
+
+MessageType起到标识的作用
+Message 和 user是基础类
+
+service包下面是
+登录验证
+Thread存入
+ThreadMap存入

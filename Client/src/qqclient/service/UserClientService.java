@@ -7,6 +7,7 @@ import commonClass.User;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -20,7 +21,8 @@ public class UserClientService {
     private User u = new User();
     private Socket socket;
 
-    //到服务器验证
+    //服务器验证功能
+    //验证成功了并将用户加入thread 和thread对应的map
     public boolean checkUser(String userId, String pwd) throws IOException, ClassNotFoundException {
         boolean b = false;
 //      这里是拿到用户的id和密码
@@ -42,10 +44,14 @@ public class UserClientService {
 
 //        这个叫用户线程
 //            创建一个和服务器保持通信的线程
+//  加入一个新的Thread
             ClientConnectServerThread ccst = new ClientConnectServerThread(socket);
             ccst.start();
             //线程池，但是他没讲，所以这里用集合
 //            放到一个线程管理的hashmap去
+//  加入map
+//                    他这里写的有问题 他如果这么写 包括Server 他这么写的后果就是一个主机只能有一个thread 因为id相同
+//                    hashmap会去重
             ManageClientConnectServerThread.addClientConnectServerThread(userId,ccst);
 
             b=true;//登录成功把返回值改成true 最好是所有的都成功了再设置为true
@@ -54,9 +60,34 @@ public class UserClientService {
             socket.close();
             //登录失败把socket关闭
         }
-
-
         return b;
+    }
+//    请求在线用户
+    public void onlineFriendList(){
+        Message message = new Message();
+        message.setMesType(MessageType.MESSAGE_GET_ONLINE_FRIEND);
+        message.setSender(u.getUserId());
+
+        try {
+            ClientConnectServerThread ccst = ManageClientConnectServerThread.getClientConnectServerThread(u.getUserId());
+            Socket ccstSocket = ccst.getSocket();
+            OutputStream os = ccstSocket.getOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            oos.writeObject(message);
+//            他那个写法是可以 对应的是一个用户多个线程，
+//            他的开始的hashmap写法的办法最多一台主机一个线程，因此他那么写没有办法实现他的这样的写法
+
+
+//          我这种写法是一个客户端一个thread的
+//            OutputStream os = socket.getOutputStream();
+//            ObjectOutputStream oos = new ObjectOutputStream(os);
+//            oos.writeObject(message);
+                    ;
+        } catch (IOException e) {
+            System.out.println("client UCS 有问题");
+        }
+
 
     }
+
 }
